@@ -1,7 +1,7 @@
 require('dotenv').config();  
 
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 
 const app = express();
@@ -33,8 +33,30 @@ async function run() {
 
     app.get('/farmers', async (req, res) => {
       const result = await FarmerCollection.find().toArray();
-      res.send(result);
-    });
+      res.send(result); 
+
+  }); 
+
+   app.get('/farmers/:id',async(req,res)=>{
+
+    const id=req.params.id 
+    const query={_id:new ObjectId(id)}
+    const result=await client.db(dbName).collection("farmers").findOne(query)
+      res.send(result)
+
+   }) 
+
+
+   app.post('/farmers',async(req,res)=>{
+
+    const data=req.body
+    const result=await FarmerCollection.insertOne(data) 
+    res.send(result)
+
+
+   })
+
+
 
     await client.db("admin").command({ ping: 1 });
     console.log(" Connected to MongoDB successfully!");
