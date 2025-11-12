@@ -51,7 +51,8 @@ async function run() {
 
     const data=req.body
     const result=await FarmerCollection.insertOne(data) 
-    res.send(result)
+    const inserted=await FarmerCollection.findOne({_id:result.insertedId})
+    res.send(inserted)
 
 
    })
