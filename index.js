@@ -55,7 +55,43 @@ async function run() {
     res.send(inserted)
 
 
+   }) 
+
+   app.put('/farmers/:id',async(req,res)=>{
+
+   const id=req.params.id 
+   const update=req.body 
+
+   const filter={_id:new ObjectId(id)}
+
+   const updateDoc={
+
+    $set:{
+
+         name:update.name,
+          location:update.location,
+          pricePerUnit:update.pricePerUnit,
+          description:update.description,
+         
+   } 
+
+ } 
+
+
+
+ 
+
+
+  
+     const result=await FarmerCollection.updateOne(filter,updateDoc)
+     res.send(result)
+
+
+
    })
+
+
+
 
 
 
