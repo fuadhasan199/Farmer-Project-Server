@@ -18,8 +18,25 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  } 
+
+}); 
+
+  const  admin = require("firebase-admin");
+
+const serviceAccount = require("./Service.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
 });
+
+const middlewar=(req,res,next)=>{
+
+  next()
+
+}
+
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
