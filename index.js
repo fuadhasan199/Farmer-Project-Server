@@ -95,7 +95,24 @@ async function run() {
  }  
 
 
- app.get('/My_Intereset',async(req,res)=>{
+
+
+
+
+
+
+ 
+
+
+  
+     const result=await FarmerCollection.updateOne(filter,updateDoc)
+     res.send(result)
+
+
+
+   })  
+
+   app.get('/My_Intereset',async(req,res)=>{
 
  const userEmail=req.query.userEmail 
 
@@ -130,20 +147,6 @@ async function run() {
 
  })
 
-
-
-
-
- 
-
-
-  
-     const result=await FarmerCollection.updateOne(filter,updateDoc)
-     res.send(result)
-
-
-
-   }) 
 
     app.delete('/farmers/:id',async(req,res)=>{
 
