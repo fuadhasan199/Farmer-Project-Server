@@ -95,6 +95,42 @@ async function run() {
  }  
 
 
+ app.get('/My_Intereset',async(req,res)=>{
+
+ const userEmail=req.query.userEmail 
+
+ if(!userEmail){
+  return res.status(400).send({error:`Sorry Email id not found`}) 
+ } 
+
+  const pipeline = [
+    { $unwind: '$interests' },
+    { $match: { 'interests.userEmail': userEmail } },
+    { $project: {
+        cropId: '$_id',
+        cropName: '$name',
+        cropOwner: '$owner',
+        cropPricePerUnit: '$pricePerUnit',
+        cropImage: '$image',
+        interestId: '$interests._id',
+        quantity: '$interests.quantity',
+        message: '$interests.message',
+        status: '$interests.status',
+        createdAt: '$interests.createdAt' 
+    } }
+  ]; 
+
+   const result = await client.db(dbName).collection('farmers').aggregate(pipeline).toArray();
+  res.send(result);
+
+ 
+
+
+
+
+ })
+
+
 
 
 
