@@ -44,19 +44,27 @@ async function run() {
   try {
     // await client.connect();
     const db = client.db(dbName);
-    const FarmerCollection = db.collection('farmers');
+    const FarmerCollection = db.collection('farmers') 
+    const interestCollection=db.collection('interest')
 
-    app.get('/farmers', async (req, res) => {
+    app.get('/farmers/home', async (req, res) => {
       const result = await FarmerCollection.find().sort({_id:-1}).limit(6).toArray();
       res.send(result); 
 
   });  
 
   app.get('/farmers',async(req,res)=>{
-     const search=req.query.search 
-     const quantity={ name:{ $regex:search ,$option:"i"}} 
-     const result=await FarmerCollection.find(quantity).toArray() 
-     res.send(result)
+     const search=req.query.search  
+
+      let query={} 
+      if(search){
+          query={ name:{$regex:search ,$options:"i"}} 
+
+      } 
+       
+     
+     const result=await FarmerCollection.find(query).toArray() 
+     res.send(result) 
   })
 
    app.get('/farmers/:id',async(req,res)=>{
@@ -77,7 +85,25 @@ async function run() {
     res.send(inserted)
 
 
-   })  
+   })   
+
+   app.post('/interest',async(req,res)=>{ 
+    const data=req.body 
+     const result=await interestCollection.insertOne(data) 
+     res.send(result)
+     
+   } ) 
+
+   app.get('/my-interest',async(req,res)=>{
+     const email=req.query.email 
+      if(!email){
+         return res.status(400).send({message:"Sorry , Email  not found"})
+      }  
+      const query={Buyer:email} 
+      const result=await interestCollection.find(query).toArray()
+       res.send(result)
+        
+   })
 
    app.put('/farmers/:id',async(req,res)=>{
 
