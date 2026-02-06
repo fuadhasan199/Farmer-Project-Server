@@ -20,9 +20,17 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   } 
 
-}); 
+});  
+const admin = require("firebase-admin");
 
-  const  admin = require("firebase-admin");
+// const serviceAccount = require("./Krisi.json");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
+
+
+ 
 
 
 const decoded = Buffer.from(process.env.Firebase_key, "base64").toString("utf8");
@@ -30,14 +38,32 @@ const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
-});
+}); 
+
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+};
 
 
 
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello World!') 
 });
 
 async function run() {
@@ -94,13 +120,18 @@ async function run() {
      
    } ) 
 
-   app.get('/my-interest',async(req,res)=>{
+   app.get('/my-interest',verifyToken,async(req,res)=>{
      const email=req.query.email 
+
+   if(req.user.email !== email){
+      return res.status(403).send({ message: "Access forbidden" })
+   }
+
       if(!email){
          return res.status(400).send({message:"Sorry , Email  not found"})
       }  
-      const query={Buyer:email} 
-      const result=await interestCollection.find(query).toArray()
+      const query={Buyer:email}  
+      const result=await interestCollection.find(query).sort({_id:-1}).toArray()
        res.send(result)
         
    }) 
